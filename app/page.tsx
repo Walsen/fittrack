@@ -1,8 +1,15 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { DumbbellIcon, MessageSquareIcon, HistoryIcon } from "lucide-react"
-import WorkoutStats from "@/components/workout-stats"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { DumbbellIcon, MessageSquareIcon, HistoryIcon } from "lucide-react";
+import WorkoutStats from "@/components/workout-stats";
 
 export default function Home() {
   return (
@@ -13,10 +20,12 @@ export default function Home() {
         <div className="container relative z-10 py-20 px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-              Your Personal <span className="text-primary">Workout Assistant</span>
+              Your Personal{" "}
+              <span className="text-primary">Workout Assistant</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Track your workouts, get fitness advice, and achieve your goals with FitTrack
+              Track your workouts, get fitness advice, and achieve your goals
+              with FitTrack
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/create">
@@ -25,7 +34,11 @@ export default function Home() {
                 </Button>
               </Link>
               <Link href="/chat">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
                   Chat with Assistant
                 </Button>
               </Link>
@@ -36,7 +49,9 @@ export default function Home() {
 
       {/* Stats section */}
       <div className="container py-12 px-4">
-        <h2 className="text-3xl font-bold text-center mb-6">Your Workout Stats</h2>
+        <h2 className="text-3xl font-bold text-center mb-6">
+          Your Workout Stats
+        </h2>
         <WorkoutStats />
       </div>
 
@@ -51,12 +66,14 @@ export default function Home() {
                 <MessageSquareIcon className="h-6 w-6 text-primary" />
               </div>
               <CardTitle className="text-xl">Chat Companion</CardTitle>
-              <CardDescription>Get workout advice from our AI assistant</CardDescription>
+              <CardDescription>
+                Get workout advice from our AI assistant
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Ask questions about exercises, form, nutrition, and more. Get personalized advice to help you reach your
-                fitness goals.
+                Ask questions about exercises, form, nutrition, and more. Get
+                personalized advice to help you reach your fitness goals.
               </p>
             </CardContent>
             <CardFooter>
@@ -78,8 +95,8 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Add exercises, sets, reps, and weights to your workout plan. Create custom workouts tailored to your
-                specific needs.
+                Add exercises, sets, reps, and weights to your workout plan.
+                Create custom workouts tailored to your specific needs.
               </p>
             </CardContent>
             <CardFooter>
@@ -101,8 +118,8 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Track your progress and see how you've improved over time. Review past workouts to inform your future
-                training.
+                Track your progress and see how you have improved over time.
+                Review past workouts to inform your future training.
               </p>
             </CardContent>
             <CardFooter>
@@ -120,9 +137,12 @@ export default function Home() {
       <div className="bg-primary/5 py-16">
         <div className="container px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">Ready to start your fitness journey?</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Ready to start your fitness journey?
+            </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Create your first workout today and take the first step towards achieving your fitness goals.
+              Create your first workout today and take the first step towards
+              achieving your fitness goals.
             </p>
             <Link href="/create">
               <Button size="lg">Get Started</Button>
@@ -131,6 +151,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

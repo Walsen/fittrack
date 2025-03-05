@@ -1,36 +1,47 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Mona_Sans as FontSans } from "next/font/google"
-import "./globals.css"
-import Navbar from "@/components/navbar"
-import { cn } from "@/lib/utils"
-import MockDataInitializer from "@/components/mock-data-initializer"
+"use client";
+
+import type React from "react";
+import { Mona_Sans as FontSans } from "next/font/google";
+import "./globals.css";
+import Navbar from "@/components/navbar";
+import { cn } from "@/lib/utils";
+import MockDataInitializer from "@/components/mock-data-initializer";
+
+import { Authenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+import { Amplify } from "aws-amplify";
+import amplifyConfig from "../amplify_outputs.json";
+
+Amplify.configure(amplifyConfig);
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
-})
-
-export const metadata: Metadata = {
-  title: "FitTrack - Your Workout Assistant",
-  description: "Track your workouts, get fitness advice, and achieve your goals",
-}
+});
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
-        <div className="relative flex min-h-screen flex-col">
-          <Navbar />
-          <div className="flex-1">{children}</div>
-          <MockDataInitializer />
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          fontSans.variable
+        )}
+      >
+        <div className="flex justify-center items-center min-h-screen">
+          <Authenticator>
+            <div className="relative flex min-h-screen flex-col w-full">
+              <Navbar />
+              <div className="flex-1">{children}</div>
+              <MockDataInitializer />
+            </div>
+          </Authenticator>
         </div>
       </body>
     </html>
-  )
+  );
 }
-
