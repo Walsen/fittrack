@@ -1,35 +1,23 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { v4 as uuidv4 } from "uuid"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PlusIcon, TrashIcon, DumbbellIcon, SaveIcon, Loader2Icon } from "lucide-react"
+import { PlusIcon, TrashIcon, DumbbellIcon, SaveIcon } from "lucide-react"
 import type { Workout, WorkoutItem } from "@/lib/types"
-import { saveWorkout, getWorkouts } from "@/lib/storage"
-import WorkoutSelectorSimple from "@/components/workout-selector-simple"
+import { saveWorkout } from "@/lib/storage"
 import { motion } from "framer-motion"
 
 export default function CreateWorkout() {
   const router = useRouter()
   const [title, setTitle] = useState("")
   const [items, setItems] = useState<WorkoutItem[]>([{ id: uuidv4(), name: "", repeats: 0, weight: 0 }])
-  const [previousWorkouts, setPreviousWorkouts] = useState<Workout[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Small delay to ensure mock data is initialized
-    const timer = setTimeout(() => {
-      setPreviousWorkouts(getWorkouts())
-      setLoading(false)
-    }, 800)
-
-    return () => clearTimeout(timer)
-  }, [])
 
   const addWorkoutItem = () => {
     setItems([...items, { id: uuidv4(), name: "", repeats: 0, weight: 0 }])
@@ -74,48 +62,6 @@ export default function CreateWorkout() {
     router.push("/history")
   }
 
-  // Handle importing an entire workout
-  const handleImportWorkout = (workout: Workout) => {
-    // Set the title with "(Copy)" suffix
-    setTitle(`${workout.title} (Copy)`)
-
-    // Create new IDs for each item to avoid duplicates
-    const newItems = workout.items.map((item) => ({
-      ...item,
-      id: uuidv4(), // Generate new IDs
-    }))
-
-    // Replace current items with the imported ones
-    setItems(newItems)
-  }
-
-  // Handle importing selected exercises
-  const handleImportExercises = (exercises: WorkoutItem[]) => {
-    // Create new IDs for each exercise to avoid duplicates
-    const newExercises = exercises.map((item) => ({
-      ...item,
-      id: uuidv4(), // Generate new IDs
-    }))
-
-    // Add the new exercises to the existing ones
-    setItems((prevItems) => [...prevItems, ...newExercises])
-  }
-
-  if (loading) {
-    return (
-      <div className="container max-w-4xl mx-auto py-10 px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Create Workout</h1>
-        </div>
-
-        <div className="flex flex-col items-center justify-center py-20">
-          <Loader2Icon className="h-12 w-12 text-primary animate-spin mb-4" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
       <div className="flex items-center justify-between mb-6">
@@ -144,17 +90,6 @@ export default function CreateWorkout() {
                 className="mt-1.5"
               />
             </div>
-
-            {previousWorkouts.length > 0 && (
-              <div className="mt-4">
-                <Label className="text-base mb-1.5 block">Import from Previous Workouts</Label>
-                <WorkoutSelectorSimple
-                  workouts={previousWorkouts}
-                  onImportWorkout={handleImportWorkout}
-                  onImportExercises={handleImportExercises}
-                />
-              </div>
-            )}
           </CardContent>
         </Card>
 
