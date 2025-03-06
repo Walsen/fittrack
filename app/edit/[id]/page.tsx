@@ -38,8 +38,9 @@ export default function EditWorkout({
   const [, setDate] = useState("");
   const [items, setItems] = useState<WorkoutItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [workoutId, setWorkoutId] = useState("");
-  const [originalItems, setOriginalItems] = useState<WorkoutItem[]>([]); // Add this new state
+  const [originalItems, setOriginalItems] = useState<WorkoutItem[]>([]);
 
   useEffect(() => {
     const resolveParams = async () => {
@@ -58,7 +59,7 @@ export default function EditWorkout({
       }
       if (fetchedWorkoutItems) {
         setItems(fetchedWorkoutItems.data);
-        setOriginalItems(fetchedWorkoutItems.data); // Store original items
+        setOriginalItems(fetchedWorkoutItems.data);
       }
       setLoading(false);
     };
@@ -66,19 +67,17 @@ export default function EditWorkout({
   }, [workoutId, router]);
 
   const addWorkoutItem = () => {
-    // TODO: Add Workout Item
     console.log("addWorkoutItem is called");
-    const workoutItem: WorkoutItem = {
+    const workoutItem: Partial<WorkoutItem> = {
       id: uuidV4(),
       name: "",
       weight: 0,
       repeats: 0,
     };
-    setItems([...items, workoutItem]);
+    setItems([...items, workoutItem as WorkoutItem]);
   };
 
   const removeWorkoutItem = (id: string) => {
-    // TODO: Remove Workout Item
     console.log("removeWorkoutItem: " + id);
     if (items.length > 1) {
       setItems(items.filter((item) => item.id !== id));
@@ -90,7 +89,6 @@ export default function EditWorkout({
     field: keyof WorkoutItem,
     value: string | number
   ) => {
-    // TODO: Update Workout Item
     console.log("updateLocalWorkoutItem: " + id + " " + field + " " + value);
     const updatedItems = items.map((item) =>
       item.id === id ? { ...item, [field]: value } : item
@@ -101,51 +99,59 @@ export default function EditWorkout({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
 
-    // Validate form
-    if (!title.trim()) {
-      alert("Please enter a workout title");
-      return;
-    }
-
-    if (items.some((item) => !item.name.trim())) {
-      alert("Please enter a name for all workout items");
-      return;
-    }
-
-    console.log("handleSubmit");
-
-    // Update the workout title
-    await updateWorkout(workoutId, title);
-
-    // Process each workout item
-    for (const item of items) {
-      const itemWithWorkoutId = {
-        ...item,
-        workoutId: workoutId,
-      };
-
-      // Check if this item existed in the original items
-      const existingItem = originalItems.find(
-        (originalItem) => originalItem.id === item.id
-      );
-
-      if (existingItem) {
-        await updateWorkoutItem(item.id, itemWithWorkoutId);
-      } else {
-        await saveWorkoutItem(itemWithWorkoutId); // You'll need to create this function in your storage
+    try {
+      // Validate form
+      if (!title.trim()) {
+        alert("Please enter a workout title");
+        return;
       }
-    }
 
-    // Handle deleted items (items that were in originalItems but not in current items)
-    for (const originalItem of originalItems) {
-      const stillExists = items.some((item) => item.id === originalItem.id);
-      if (!stillExists) {
-        await deleteWorkoutItem(originalItem.id);
+      if (items.some((item) => !item.name.trim())) {
+        alert("Please enter a name for all workout items");
+        return;
       }
-    }
 
-    router.push(`/workout/${workoutId}`);
+      console.log("handleSubmit");
+
+      // Update the workout title
+      await updateWorkout(workoutId, title);
+
+      // Process each workout item
+      for (const item of items) {
+        const itemWithWorkoutId = {
+          ...item,
+          workoutId: workoutId,
+        };
+
+        // Check if this item existed in the original items
+        const existingItem = originalItems.find(
+          (originalItem) => originalItem.id === item.id
+        );
+
+        if (existingItem) {
+          await updateWorkoutItem(item.id, itemWithWorkoutId);
+        } else {
+          await saveWorkoutItem(itemWithWorkoutId);
+        }
+      }
+
+      // Handle deleted items
+      for (const originalItem of originalItems) {
+        const stillExists = items.some((item) => item.id === originalItem.id);
+        if (!stillExists) {
+          await deleteWorkoutItem(originalItem.id);
+        }
+      }
+
+      router.push(`/workout/${workoutId}`);
+    } catch (error) {
+      console.error("Error updating workout:", error);
+      alert("Error updating workout");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -179,9 +185,22 @@ export default function EditWorkout({
           </Link>
           <h1 className="text-3xl font-bold">Edit Workout</h1>
         </div>
-        <Button onClick={handleSubmit} className="flex items-center gap-2">
-          <SaveIcon className="h-4 w-4" />
-          Save Changes
+        <Button
+          onClick={handleSubmit}
+          className="flex items-center gap-2"
+          disabled={saving}
+        >
+          {saving ? (
+            <>
+              <Loader2Icon className="h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <SaveIcon className="h-4 w-4" />
+              Save Changes
+            </>
+          )}
         </Button>
       </div>
 

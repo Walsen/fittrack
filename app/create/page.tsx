@@ -8,26 +8,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusIcon, TrashIcon, DumbbellIcon, SaveIcon } from "lucide-react";
+import {
+  PlusIcon,
+  TrashIcon,
+  DumbbellIcon,
+  SaveIcon,
+  Loader2Icon,
+} from "lucide-react";
 import type { Workout, WorkoutItem } from "@/lib/types";
 import { saveWorkout, saveWorkoutItem } from "@/lib/storage";
 import { motion } from "framer-motion";
 import { v4 as uuidV4 } from "uuid";
+
 export default function CreateWorkout() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [items, setItems] = useState<WorkoutItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const addWorkoutItem = () => {
-    // TODO: Add Workout Item
     console.log("addWorkoutItem is called");
-    const workoutItem: WorkoutItem = {
+    const workoutItem: Partial<WorkoutItem> = {
       id: uuidV4(),
       name: "",
       weight: 0,
       repeats: 0,
     };
-    setItems([...items, workoutItem]);
+    setItems([...items, workoutItem as WorkoutItem]);
   };
 
   const removeWorkoutItem = (id: string) => {
@@ -54,50 +61,74 @@ export default function CreateWorkout() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
-    // Validate form
-    if (!title.trim()) {
-      alert("Please enter a workout title");
-      return;
+    try {
+      // Validate form
+      if (!title.trim()) {
+        alert("Please enter a workout title");
+        return;
+      }
+
+      if (items.some((item) => !item.name.trim())) {
+        alert("Please enter a name for all workout items");
+        return;
+      }
+
+      console.log("handleSubmit");
+
+      const workout: Workout = {
+        title: title,
+        date: new Date().toISOString(),
+        id: uuidV4(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        items: async () => Promise.resolve({ data: [] }),
+      };
+
+      const savedWorkout = await saveWorkout(workout);
+
+      if (savedWorkout) {
+        const updatedItems = items.map((item) => ({
+          ...item,
+          workoutId: savedWorkout.id,
+        }));
+
+        setItems(updatedItems);
+
+        await Promise.all(updatedItems.map((item) => saveWorkoutItem(item)));
+      }
+
+      // Redirect to workout details page
+      router.push(`/history`);
+    } catch (error) {
+      console.error("Error saving workout:", error);
+      alert("Error saving workout");
+    } finally {
+      setLoading(false);
     }
-
-    if (items.some((item) => !item.name.trim())) {
-      alert("Please enter a name for all workout items");
-      return;
-    }
-
-    console.log("handleSubmit");
-
-    const workout: Workout = {
-      title: title,
-      date: new Date().toISOString(),
-    };
-    const savedWorkout = await saveWorkout(workout);
-
-    if (savedWorkout) {
-      const updatedItems = items.map((item) => ({
-        ...item,
-        workoutId: savedWorkout.id, // Directly set the new workoutId
-      }));
-
-      setItems(updatedItems); // Correctly update state
-
-      updatedItems.forEach((item) => {
-        saveWorkoutItem(item);
-      });
-    }
-
-    // Redirect to workout details page
-    router.push(`/history`);
   };
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Create Workout</h1>
-        <Button onClick={handleSubmit} className="flex items-center gap-2">
-          <SaveIcon className="h-4 w-4" />
-          Save Workout
+        <Button
+          onClick={handleSubmit}
+          className="flex items-center gap-2"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <Loader2Icon className="h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <SaveIcon className="h-4 w-4" />
+              Save Workout
+            </>
+          )}
         </Button>
       </div>
 
