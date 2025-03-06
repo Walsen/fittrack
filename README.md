@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FitTrack - Your Personal AI-Powered Workout Assistant
 
-## Getting Started
+FitTrack is a modern web application that helps users track their workouts, get personalized fitness advice, and achieve their fitness goals. Built with Next.js and AWS Amplify, it combines powerful workout tracking capabilities with an AI-powered chat assistant to provide a comprehensive fitness companion.
 
-First, run the development server:
+The application features an intuitive workout creation system, detailed workout history tracking, and insightful statistics visualization. Users can create custom workouts, track their progress over time, and receive AI-powered guidance through an integrated chat interface. The application leverages AWS Bedrock for intelligent workout analysis and recommendations, making it a smart choice for both beginners and experienced fitness enthusiasts.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Repository Structure
+```
+.
+├── amplify/                  # AWS Amplify backend configuration and resources
+│   ├── auth/                # Authentication configuration
+│   ├── data/                # Data models and API configuration
+│   └── backend.ts           # Main backend configuration file
+├── app/                     # Next.js application routes and pages
+│   ├── api/                # API route handlers
+│   ├── chat/               # AI chat interface
+│   ├── create/             # Workout creation page
+│   ├── edit/               # Workout editing functionality
+│   ├── history/            # Workout history view
+│   └── workout/            # Individual workout view
+├── components/             # Reusable React components
+│   ├── ui/                # UI component library
+│   └── workout-*.tsx      # Workout-specific components
+└── lib/                   # Shared utilities and services
+    ├── services/          # Business logic services
+    └── types.ts           # TypeScript type definitions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Usage Instructions
+### Prerequisites
+- Node.js 18.x or later
+- npm or yarn package manager
+- AWS account with appropriate credentials
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Installation
+```bash
+# Clone the repository
+git clone <repository-url>
+cd fittrack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Install dependencies
+npm install
 
-## Learn More
+# Run the Amplify Sandbox
+npx ampx sandbox
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Quick Start
+1. Start the development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Open your browser and navigate to `http://localhost:3000`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Sign up for a new account using the authentication system
 
-## Deploy on Vercel
+4. Create your first workout:
+```typescript
+// Example workout creation
+const workout = {
+  title: "Full Body Workout",
+  exercises: [
+    { name: "Push-ups", repeats: 10, weight: 0 },
+    { name: "Squats", repeats: 15, weight: 0 }
+  ]
+};
+```
+## Data Flow
+The application follows a client-server architecture with AWS Amplify handling the backend services.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```ascii
++----------------+     +-----------------+     +------------------+
+|                |     |                 |     |                  |
+| React Frontend |<--->| Next.js API     |<--->| AWS Amplify     |
+| Components     |     | Routes          |     | Backend Services |
+|                |     |                 |     |                  |
++----------------+     +-----------------+     +------------------+
+        ^                                            ^
+        |                                            |
+        v                                            v
++----------------+                           +------------------+
+|                |                           |                  |
+| Local Storage  |                           | AWS Bedrock      |
+| (Cache)        |                           | (AI Assistant)   |
+|                |                           |                  |
++----------------+                           +------------------+
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Key component interactions:
+1. Frontend components make API calls to Next.js routes
+2. API routes communicate with AWS Amplify backend services
+3. Authentication is handled by AWS Cognito through Amplify
+4. Workout data is stored in AWS DynamoDB
+5. AI chat functionality uses AWS Bedrock
+6. Local storage caches user preferences and session data
+7. Real-time updates are handled through WebSocket connections
+
+## Infrastructure
+
+![Infrastructure diagram](./docs/infra.svg)
+### AWS Resources
+- AppSync:
+  - Purpose: Handles API requests and data processing
+
+- DynamoDB:
+  - Purpose: Stores workout and user data
+
+- Cognito:
+  - Purpose: Manages user authentication
+
+- Amazon Bedrock
+  - Purpose: Provides AI-powered workout assistance through LLMs and Knowledge Bases

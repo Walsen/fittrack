@@ -1,10 +1,10 @@
 "use client";
 
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Schema } from "@/amplify/data/resource";
 import { generateClient } from "aws-amplify/api";
 import { AIConversation, createAIHooks } from "@aws-amplify/ui-react-ai";
+import {BotIcon} from "lucide-react";
 
 const client = generateClient<Schema>();
 const { useAIConversation } = createAIHooks(client);
@@ -23,17 +23,21 @@ export default function ChatPage() {
       </h1>
 
       <Card className="shadow-md border-0">
-        <CardHeader className="border-b bg-muted/50">
-          <CardTitle className="text-lg flex items-center">
-            <BotIcon className="h-5 w-5 mr-2 text-primary" />
-            Workout Assistant
-          </CardTitle>
-        </CardHeader>
-        <AIConversation
-          messages={messages}
-          isLoading={isLoading}
-          handleSendMessage={handleSendMessage}
-        />
+        <CardContent className="p-0">
+          <CardHeader className="border-b bg-muted/50">
+            <CardTitle className="text-lg flex items-center">
+              <BotIcon className="h-5 w-5 mr-2 text-primary" />
+              Workout Assistant
+            </CardTitle>
+          </CardHeader>
+          <div className="h-[600px]">
+            <AIConversation
+              messages={messages}
+              isLoading={isLoading}
+              handleSendMessage={handleSendMessage}
+            />
+          </div>
+        </CardContent>
       </Card>
     </div>
   );
