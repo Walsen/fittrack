@@ -5,7 +5,6 @@ import { Mona_Sans as FontSans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import { cn } from "@/lib/utils";
-import MockDataInitializer from "@/components/mock-data-initializer";
 
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
@@ -37,7 +36,6 @@ export default function RootLayout({
             <div className="relative flex min-h-screen flex-col w-full">
               <Navbar />
               <div className="flex-1">{children}</div>
-              <MockDataInitializer />
             </div>
           </Authenticator>
         </div>

@@ -1,66 +1,95 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PlusIcon, TrashIcon, DumbbellIcon, SaveIcon } from "lucide-react"
-import type { Workout, WorkoutItem } from "@/lib/types"
-import { saveWorkout } from "@/lib/storage"
-import { motion } from "framer-motion"
-
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PlusIcon, TrashIcon, DumbbellIcon, SaveIcon } from "lucide-react";
+import type { Workout, WorkoutItem } from "@/lib/types";
+import { saveWorkout, saveWorkoutItem } from "@/lib/storage";
+import { motion } from "framer-motion";
+import { v4 as uuidV4 } from "uuid";
 export default function CreateWorkout() {
-  const router = useRouter()
-  const [title, setTitle] = useState("")
-  const [items, setItems] = useState<WorkoutItem[]>([{ id: uuidv4(), name: "", repeats: 0, weight: 0 }])
+  const router = useRouter();
+  const [title, setTitle] = useState("");
+  const [items, setItems] = useState<WorkoutItem[]>([]);
 
   const addWorkoutItem = () => {
-    setItems([...items, { id: uuidv4(), name: "", repeats: 0, weight: 0 }])
-  }
+    // TODO: Add Workout Item
+    console.log("addWorkoutItem is called");
+    const workoutItem: WorkoutItem = {
+      id: uuidV4(),
+      name: "",
+      weight: 0,
+      repeats: 0,
+    };
+    setItems([...items, workoutItem]);
+  };
 
   const removeWorkoutItem = (id: string) => {
+    // TODO: Remove Workout Item
+    console.log("removeWorkoutItem: " + id);
     if (items.length > 1) {
-      setItems(items.filter((item) => item.id !== id))
+      setItems(items.filter((item) => item.id !== id));
     }
-  }
+  };
 
-  const updateWorkoutItem = (id: string, field: keyof WorkoutItem, value: string | number) => {
-    setItems(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
-  }
+  const updateWorkoutItem = (
+    id: string,
+    field: keyof WorkoutItem,
+    value: string | number
+  ) => {
+    // TODO: Update Workout Item
+    console.log("updateWorkoutItem: " + id + " " + field + " " + value);
+    const updatedItems = items.map((item) =>
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    console.log("updatedItems: ", updatedItems);
+    setItems(updatedItems);
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     // Validate form
     if (!title.trim()) {
-      alert("Please enter a workout title")
-      return
+      alert("Please enter a workout title");
+      return;
     }
 
     if (items.some((item) => !item.name.trim())) {
-      alert("Please enter a name for all workout items")
-      return
+      alert("Please enter a name for all workout items");
+      return;
     }
 
-    // Create workout object
+    console.log("handleSubmit");
+
     const workout: Workout = {
-      id: uuidv4(),
-      title,
+      title: title,
       date: new Date().toISOString(),
-      items,
+    };
+    const savedWorkout = await saveWorkout(workout);
+
+    if (savedWorkout) {
+      const updatedItems = items.map((item) => ({
+        ...item,
+        workoutId: savedWorkout.id, // Directly set the new workoutId
+      }));
+
+      setItems(updatedItems); // Correctly update state
+
+      updatedItems.forEach((item) => {
+        saveWorkoutItem(item);
+      });
     }
 
-    // Save workout
-    saveWorkout(workout)
-
-    // Redirect to history page
-    router.push("/history")
-  }
+    // Redirect to workout details page
+    router.push(`/history`);
+  };
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
@@ -95,7 +124,12 @@ export default function CreateWorkout() {
 
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">Exercises</h2>
-          <Button type="button" variant="outline" onClick={addWorkoutItem} className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addWorkoutItem}
+            className="flex items-center gap-2"
+          >
             <PlusIcon className="h-4 w-4" /> Add Exercise
           </Button>
         </div>
@@ -104,7 +138,12 @@ export default function CreateWorkout() {
           <div className="text-center py-10 border border-dashed rounded-lg">
             <DumbbellIcon className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
             <p className="text-muted-foreground">No exercises added yet</p>
-            <Button type="button" variant="outline" onClick={addWorkoutItem} className="mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addWorkoutItem}
+              className="mt-4"
+            >
               Add Your First Exercise
             </Button>
           </div>
@@ -138,7 +177,9 @@ export default function CreateWorkout() {
                         <Input
                           id={`name-${item.id}`}
                           value={item.name}
-                          onChange={(e) => updateWorkoutItem(item.id, "name", e.target.value)}
+                          onChange={(e) =>
+                            updateWorkoutItem(item.id, "name", e.target.value)
+                          }
                           placeholder="e.g., Bench Press"
                           className="mt-1.5"
                         />
@@ -150,7 +191,13 @@ export default function CreateWorkout() {
                           type="number"
                           min="0"
                           value={item.repeats}
-                          onChange={(e) => updateWorkoutItem(item.id, "repeats", Number.parseInt(e.target.value) || 0)}
+                          onChange={(e) =>
+                            updateWorkoutItem(
+                              item.id,
+                              "repeats",
+                              Number.parseInt(e.target.value) || 0
+                            )
+                          }
                           placeholder="e.g., 12"
                           className="mt-1.5"
                         />
@@ -163,7 +210,13 @@ export default function CreateWorkout() {
                           min="0"
                           step="0.5"
                           value={item.weight}
-                          onChange={(e) => updateWorkoutItem(item.id, "weight", Number.parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            updateWorkoutItem(
+                              item.id,
+                              "weight",
+                              Number.parseFloat(e.target.value) || 0
+                            )
+                          }
                           placeholder="e.g., 60"
                           className="mt-1.5"
                         />
@@ -177,6 +230,5 @@ export default function CreateWorkout() {
         )}
       </form>
     </div>
-  )
+  );
 }
-

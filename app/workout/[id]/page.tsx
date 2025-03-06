@@ -1,42 +1,70 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeftIcon, CalendarIcon, TrashIcon, EditIcon, DumbbellIcon, Loader2Icon } from "lucide-react"
-import type { Workout } from "@/lib/types"
-import { getWorkoutById, deleteWorkout } from "@/lib/storage"
-import { formatDate } from "@/lib/utils"
-import { motion } from "framer-motion"
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ArrowLeftIcon,
+  CalendarIcon,
+  TrashIcon,
+  EditIcon,
+  DumbbellIcon,
+  Loader2Icon,
+} from "lucide-react";
+import type { Workout, WorkoutItem } from "@/lib/types";
+import { getWorkoutById, deleteWorkout } from "@/lib/storage";
+import { formatDate } from "@/lib/utils";
+import { motion } from "framer-motion";
 
-export default function WorkoutDetails({ params }: { params: { id: string } }) {
-  const router = useRouter()
-  const [workout, setWorkout] = useState<Workout | null>(null)
-  const [loading, setLoading] = useState(true)
+export default function WorkoutDetails({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const router = useRouter();
+  const [workout, setWorkout] = useState<Workout | null>(null);
+  const [workoutItems, setWorkoutItems] = useState<WorkoutItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [workoutId, setWorkoutId] = useState("");
+  useEffect(() => {
+    const resolveParams = async () => {
+      const { id } = await params;
+      setWorkoutId(id);
+    };
+    resolveParams();
+  }, [params]);
 
   useEffect(() => {
-    // Small delay to simulate loading and ensure mock data is initialized
-    const timer = setTimeout(() => {
-      const foundWorkout = getWorkoutById(params.id)
-      if (foundWorkout) {
-        setWorkout(foundWorkout)
-      } else {
-        router.push("/history")
+    const fetchWorkouts = async () => {
+      const fetchedWorkout = await getWorkoutById(workoutId);
+      const fetchWorkoutItems = await workout?.items();
+      if (fetchedWorkout) {
+        setWorkout(fetchedWorkout);
       }
-      setLoading(false)
-    }, 800)
-
-    return () => clearTimeout(timer)
-  }, [params.id, router])
+      if (fetchWorkoutItems) {
+        setWorkoutItems(fetchWorkoutItems.data);
+      }
+      setLoading(false);
+    };
+    fetchWorkouts();
+  }, [workoutId, router, workout]);
 
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this workout?")) {
-      deleteWorkout(params.id)
-      router.push("/history")
+      if (workout) {
+        deleteWorkout(workout?.id);
+        router.push("/history");
+      }
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -55,7 +83,7 @@ export default function WorkoutDetails({ params }: { params: { id: string } }) {
           <p className="text-muted-foreground">Loading workout details...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!workout) {
@@ -65,14 +93,15 @@ export default function WorkoutDetails({ params }: { params: { id: string } }) {
           <DumbbellIcon className="h-12 w-12 text-muted-foreground/50 mb-4" />
           <h2 className="text-xl font-semibold mb-2">Workout not found</h2>
           <p className="text-muted-foreground mb-6">
-            The workout you're looking for doesn't exist or has been deleted.
+            The workout you are looking for doesn&apos;t exist or has been
+            deleted.
           </p>
           <Link href="/history">
             <Button>Back to History</Button>
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -99,7 +128,7 @@ export default function WorkoutDetails({ params }: { params: { id: string } }) {
       <h2 className="text-xl font-semibold mb-4">Exercises</h2>
 
       <div className="space-y-4 mb-8">
-        {workout.items.map((item, index) => (
+        {workoutItems.map((item, index) => (
           <motion.div
             key={item.id}
             initial={{ opacity: 0, y: 20 }}
@@ -129,16 +158,19 @@ export default function WorkoutDetails({ params }: { params: { id: string } }) {
       </div>
 
       <div className="flex justify-end gap-4">
-        <Link href={`/edit/${params.id}`}>
+        <Link href={`/edit/${workoutId}`}>
           <Button variant="outline" className="flex items-center gap-2">
             <EditIcon className="h-4 w-4" /> Edit Workout
           </Button>
         </Link>
-        <Button variant="destructive" onClick={handleDelete} className="flex items-center gap-2">
+        <Button
+          variant="destructive"
+          onClick={handleDelete}
+          className="flex items-center gap-2"
+        >
           <TrashIcon className="h-4 w-4" /> Delete Workout
         </Button>
       </div>
     </div>
-  )
+  );
 }
-

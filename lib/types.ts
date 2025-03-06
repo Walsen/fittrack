@@ -1,20 +1,10 @@
-export interface WorkoutItem {
-  id: string
-  name: string
-  repeats: number
-  weight: number
-}
+import { Schema } from "@/amplify/data/resource";
 
-export interface Workout {
-  id: string
-  title: string
-  date: string
-  items: WorkoutItem[]
-}
+export type Workout = Schema["Workout"]["type"];
+export type WorkoutItem = Schema["WorkoutItem"]["type"];
 
 export interface Message {
-  id: string
-  role: "user" | "assistant"
-  content: string
+  id: string;
+  role: "user" | "assistant";
+  content: string;
 }
-
