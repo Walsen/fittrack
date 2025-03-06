@@ -18,6 +18,7 @@ import {
   EditIcon,
   DumbbellIcon,
   Loader2Icon,
+  BrainIcon,
 } from "lucide-react";
 import type { Workout, WorkoutItem } from "@/lib/types";
 import { getWorkoutById, deleteWorkout } from "@/lib/storage";
@@ -34,6 +35,9 @@ export default function WorkoutDetails({
   const [workoutItems, setWorkoutItems] = useState<WorkoutItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [workoutId, setWorkoutId] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysis, setAnalysis] = useState<string | null>(null);
+
   useEffect(() => {
     const resolveParams = async () => {
       const { id } = await params;
@@ -45,25 +49,47 @@ export default function WorkoutDetails({
   useEffect(() => {
     const fetchWorkouts = async () => {
       const fetchedWorkout = await getWorkoutById(workoutId);
-      const fetchWorkoutItems = await workout?.items();
+      const fetchedWorkoutItems = await fetchedWorkout?.items();
       if (fetchedWorkout) {
         setWorkout(fetchedWorkout);
       }
-      if (fetchWorkoutItems) {
-        setWorkoutItems(fetchWorkoutItems.data);
+      if (fetchedWorkoutItems) {
+        setWorkoutItems(fetchedWorkoutItems.data);
       }
       setLoading(false);
     };
-    fetchWorkouts();
-  }, [workoutId, router, workout]);
+    if (workoutId) {
+      fetchWorkouts();
+    }
+  }, [workoutId]);
 
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this workout?")) {
       if (workout) {
-        deleteWorkout(workout?.id);
+        deleteWorkout(workout.id);
         router.push("/history");
       }
     }
+  };
+
+  const analyzeWorkout = async () => {
+    setAnalyzing(true);
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const mockAnalysis = `Based on my analysis of this workout:
+
+1. Intensity Level: ${workoutItems.length > 3 ? "High" : "Moderate"}
+2. Focus Areas: ${workoutItems.map((item) => item.name).join(", ")}
+3. Recommendations:
+   - Consider increasing weight on ${workoutItems[0]?.name || "exercises"}
+   - Add more repetitions for better endurance
+   - Good balance of exercises overall
+
+Overall, this is a well-structured workout with room for progressive overload.`;
+
+    setAnalysis(mockAnalysis);
+    setAnalyzing(false);
   };
 
   if (loading) {
@@ -97,7 +123,10 @@ export default function WorkoutDetails({
             deleted.
           </p>
           <Link href="/history">
-            <Button>Back to History</Button>
+            <Button>
+              <ArrowLeftIcon className="h-5 w-5 mr-2" />
+              Back to History
+            </Button>
           </Link>
         </div>
       </div>
@@ -124,6 +153,37 @@ export default function WorkoutDetails({
           </CardDescription>
         </CardHeader>
       </Card>
+
+      <div className="mb-8">
+        <Button
+          onClick={analyzeWorkout}
+          className="flex items-center gap-2 mb-4"
+          disabled={analyzing}
+        >
+          {analyzing ? (
+            <>
+              <Loader2Icon className="h-4 w-4 animate-spin" />
+              Analyzing Workout...
+            </>
+          ) : (
+            <>
+              <BrainIcon className="h-4 w-4" />
+              Analyze Workout
+            </>
+          )}
+        </Button>
+
+        {analysis && (
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle>Workout Analysis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="whitespace-pre-wrap text-sm">{analysis}</pre>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       <h2 className="text-xl font-semibold mb-4">Exercises</h2>
 

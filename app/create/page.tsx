@@ -80,12 +80,7 @@ export default function CreateWorkout() {
       const workout: Workout = {
         title: title,
         date: new Date().toISOString(),
-        id: uuidV4(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        items: async () => Promise.resolve({ data: [] }),
       };
-
       const savedWorkout = await saveWorkout(workout);
 
       if (savedWorkout) {
@@ -96,7 +91,9 @@ export default function CreateWorkout() {
 
         setItems(updatedItems);
 
-        await Promise.all(updatedItems.map((item) => saveWorkoutItem(item)));
+        updatedItems.forEach((item) => {
+          saveWorkoutItem(item);
+        });
       }
 
       // Redirect to workout details page
