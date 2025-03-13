@@ -14,10 +14,10 @@ const backend = defineBackend({
 const KnowledgeBaseDataSource =
   backend.data.resources.graphqlApi.addHttpDataSource(
     "WorkoutGymKnowledgeBaseDataSource",
-    "https://bedrock-agent-runtime.<region>.amazonaws.com",
+    "https://bedrock-agent-runtime.us-east-1.amazonaws.com",
     {
       authorizationConfig: {
-        signingRegion: "<region>",
+        signingRegion: "us-east-1",
         signingServiceName: "bedrock",
       },
     }
@@ -26,7 +26,7 @@ const KnowledgeBaseDataSource =
 KnowledgeBaseDataSource.grantPrincipal.addToPrincipalPolicy(
   new iam.PolicyStatement({
     resources: [
-      "arn:aws:bedrock:<region>:<user-id>:knowledge-base/<knowledge-base-id>",
+      `arn:aws:bedrock:us-east-1:${process.env.USER_ID}:knowledge-base/${process.env.KNOWLEDGEBASE_ID}`,
     ],
     actions: ["bedrock:Retrieve"],
   })

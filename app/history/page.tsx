@@ -5,7 +5,6 @@ import {
   ArrowRightIcon,
   CalendarIcon,
   DumbbellIcon,
-  Link,
   Loader2Icon,
   PlusIcon,
 } from "lucide-react";

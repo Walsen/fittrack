@@ -40,7 +40,7 @@ export default function WorkoutDetails({
   const [workoutItems, setWorkoutItems] = useState<WorkoutItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [workoutId, setWorkoutId] = useState("");
-  const [{ data, isLoading: isReviewLoading, messages }, analyzeTraining] =
+  const [{ data, isLoading: isReviewLoading }, analyzeTraining] =
     useAIGeneration("analyzeTraining");
   useEffect(() => {
     const resolveParams = async () => {
