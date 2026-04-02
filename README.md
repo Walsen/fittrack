@@ -55,16 +55,6 @@ npx ampx sandbox
 | `KB_BUCKET_NAME` | No | Amplify sandbox / CI | Name of an existing S3 bucket to reuse for the Knowledge Base data source. If omitted, a new bucket is created on first deploy. |
 | `AWS_PROFILE` | Yes (local) | Shell / `.envrc` | AWS CLI profile with permissions for Amplify, Bedrock, and related services. Defaults to `awscbba` via the `.envrc` file. |
 
-#### Vercel Deployment Variables
-
-These are only needed when deploying through `vercel.sh`:
-
-| Variable | Description |
-|---|---|
-| `AWS_ROLE_ARN` | IAM role ARN assumed via OIDC for deployment |
-| `AMPLIFY_APP_ID` | Amplify app ID used to generate `amplify_outputs.json` |
-| `VERCEL_OIDC_TOKEN` | Provided automatically by Vercel |
-
 #### Bedrock Knowledge Base Setup
 
 The AI assistant uses a Bedrock Knowledge Base backed by an S3 data source to answer gym-related queries. The S3 bucket is created automatically by the Amplify backend (`KBBucketName` stack output), but the Knowledge Base itself must be created manually.
