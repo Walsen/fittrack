@@ -25,6 +25,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: echo '{}' > amplify_outputs.json
       - run: pnpm run lint
       - run: pnpm tsc --noEmit
 
