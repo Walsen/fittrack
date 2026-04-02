@@ -45,6 +45,65 @@ npm install
 npx ampx sandbox
 ```
 
+### Environment Configuration
+
+#### Required Environment Variables
+
+| Variable | Required | Context | Description |
+|---|---|---|---|
+| `KNOWLEDGEBASE_ID` | Yes | Amplify sandbox / CI | Bedrock Knowledge Base ID used for the gym-search tool. The sandbox will fail to start without it. |
+| `KB_BUCKET_NAME` | No | Amplify sandbox / CI | Name of an existing S3 bucket to reuse for the Knowledge Base data source. If omitted, a new bucket is created on first deploy. |
+| `AWS_PROFILE` | Yes (local) | Shell / `.envrc` | AWS CLI profile with permissions for Amplify, Bedrock, and related services. Defaults to `awscbba` via the `.envrc` file. |
+
+#### Vercel Deployment Variables
+
+These are only needed when deploying through `vercel.sh`:
+
+| Variable | Description |
+|---|---|
+| `AWS_ROLE_ARN` | IAM role ARN assumed via OIDC for deployment |
+| `AMPLIFY_APP_ID` | Amplify app ID used to generate `amplify_outputs.json` |
+| `VERCEL_OIDC_TOKEN` | Provided automatically by Vercel |
+
+#### Bedrock Knowledge Base Setup
+
+The AI assistant uses a Bedrock Knowledge Base backed by an S3 data source to answer gym-related queries. The S3 bucket is created automatically by the Amplify backend (`KBBucketName` stack output), but the Knowledge Base itself must be created manually.
+
+1. **Start the sandbox once** (without `KNOWLEDGEBASE_ID`) to provision the S3 bucket. The command will fail — that's expected. Note the `KBBucketName` value from the stack outputs.
+
+2. **Seed the bucket** with gym/fitness documents (place your files in `docs/kb-data/`):
+   ```bash
+   just seed-kb <KBBucketName>
+   ```
+
+3. **Create the Knowledge Base** in the [Amazon Bedrock console](https://console.aws.amazon.com/bedrock/home#/knowledge-bases):
+   - Name: any descriptive name (e.g. `fittrack-gym-kb`)
+   - Data source: choose **Amazon S3** and point it to the bucket from step 1
+   - Embedding model: select an available embeddings model (e.g. Titan Embeddings V2)
+   - Vector store: use the default (Bedrock-managed OpenSearch Serverless)
+   - After creation, click **Sync** on the data source to index the documents
+
+4. **Copy the Knowledge Base ID** from the console (format: `XXXXXXXXXX`).
+
+5. **Start the sandbox** with the ID:
+   ```bash
+   KNOWLEDGEBASE_ID=<your-kb-id> npx ampx sandbox
+   ```
+   Or add it to a `.env` file (the `justfile` has `set dotenv-load` enabled):
+   ```
+   KNOWLEDGEBASE_ID=<your-kb-id>
+   ```
+   Then simply run:
+   ```bash
+   just sandbox
+   ```
+
+> **How it works:** The `searchGym` query in `amplify/data/resource.ts` uses an AppSync HTTP data source that calls the Bedrock `Retrieve` API. The resolver (`amplify/data/bedrockresolver.js`) sends the user's input as a retrieval query and returns matching Knowledge Base results to the AI conversation tool.
+
+#### Devbox
+
+The project includes a `devbox.json` that provisions Node.js, AWS CLI, just, pnpm, jq, yq, and zellij. If you have devbox and direnv installed, the environment activates automatically when you `cd` into the project.
+
 ### Quick Start
 1. Start the development server:
 ```bash

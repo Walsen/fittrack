@@ -11,7 +11,9 @@ import "@aws-amplify/ui-react/styles.css";
 import { Amplify } from "aws-amplify";
 import amplifyConfig from "../amplify_outputs.json";
 
-Amplify.configure(amplifyConfig);
+if (Object.keys(amplifyConfig).length > 0) {
+  Amplify.configure(amplifyConfig);
+}
 
 const fontSans = FontSans({
   subsets: ["latin"],

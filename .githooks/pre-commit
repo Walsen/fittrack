@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+pkg="${PKG_MANAGER:-npm}"
+
+echo "🔍 Running linter..."
+$pkg run lint
+
+echo "✅ Lint passed"
