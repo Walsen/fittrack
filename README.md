@@ -29,7 +29,7 @@ The application features an intuitive workout creation system, detailed workout 
 ## Usage Instructions
 ### Prerequisites
 - Node.js 18.x or later
-- npm or yarn package manager
+- pnpm package manager
 - AWS account with appropriate credentials
 
 ### Installation
@@ -39,10 +39,10 @@ git clone <repository-url>
 cd fittrack
 
 # Install dependencies
-npm install
+pnpm install
 
 # Run the Amplify Sandbox
-npx ampx sandbox
+pnpm ampx sandbox
 ```
 
 ### Environment Configuration
@@ -77,7 +77,7 @@ The AI assistant uses a Bedrock Knowledge Base backed by an S3 data source to an
 
 5. **Start the sandbox** with the ID:
    ```bash
-   KNOWLEDGEBASE_ID=<your-kb-id> npx ampx sandbox
+   KNOWLEDGEBASE_ID=<your-kb-id> pnpm ampx sandbox
    ```
    Or add it to a `.env` file (the `justfile` has `set dotenv-load` enabled):
    ```
@@ -97,7 +97,7 @@ The project includes a `devbox.json` that provisions Node.js, AWS CLI, just, pnp
 ### Quick Start
 1. Start the development server:
 ```bash
-npm run dev
+pnpm dev
 ```
 
 2. Open your browser and navigate to `http://localhost:3000`
