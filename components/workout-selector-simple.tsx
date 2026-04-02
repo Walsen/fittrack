@@ -20,9 +20,13 @@ import { CalendarIcon, SearchIcon, CheckIcon } from "lucide-react";
 import type { Workout, WorkoutItem } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
+interface ResolvedWorkout extends Omit<Workout, "items"> {
+  items: WorkoutItem[];
+}
+
 interface WorkoutSelectorProps {
-  workouts: Workout[];
-  onImportWorkout: (workout: Workout) => void;
+  workouts: ResolvedWorkout[];
+  onImportWorkout: (workout: ResolvedWorkout) => void;
   onImportExercises: (exercises: WorkoutItem[]) => void;
 }
 
@@ -32,7 +36,7 @@ export default function WorkoutSelectorSimple({
   onImportExercises,
 }: WorkoutSelectorProps) {
   const [search, setSearch] = useState("");
-  const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+  const [selectedWorkout, setSelectedWorkout] = useState<ResolvedWorkout | null>(null);
   const [selectedExercises, setSelectedExercises] = useState<
     Record<string, boolean>
   >({});
@@ -48,7 +52,7 @@ export default function WorkoutSelectorSimple({
   );
 
   // Handle workout selection
-  const handleWorkoutSelect = (workout: Workout) => {
+  const handleWorkoutSelect = (workout: ResolvedWorkout) => {
     setSelectedWorkout(workout);
     // Reset exercise selections when changing workouts
     setSelectedExercises({});
