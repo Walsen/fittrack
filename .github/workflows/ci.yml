@@ -45,7 +45,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Generate CycloneDX SBOM
-        run: npx @cyclonedx/cdxgen -o sbom.json --format json
+        run: pnpm exec cdxgen -o sbom.json --format json --type js
       - uses: actions/upload-artifact@v4
         with:
           name: sbom
