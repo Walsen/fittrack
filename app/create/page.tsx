@@ -77,11 +77,11 @@ export default function CreateWorkout() {
 
       console.log("handleSubmit");
 
-      const workout: Workout = {
+      const workout: Pick<Workout, "title" | "date"> = {
         title: title,
         date: new Date().toISOString(),
       };
-      const savedWorkout = await saveWorkout(workout);
+      const savedWorkout = await saveWorkout(workout as Workout);
 
       if (savedWorkout) {
         const updatedItems = items.map((item) => ({
