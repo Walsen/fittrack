@@ -5,9 +5,10 @@ frontend:
       commands:
         - npm install -g pnpm
         - pnpm install
-        - pnpm exec ampx generate outputs --branch $AWS_BRANCH --app-id $AWS_APP_ID
+        - pnpm exec ampx generate outputs --branch main --app-id $AWS_APP_ID
     build:
       commands:
+        - export NODE_OPTIONS=--max-old-space-size=7168
         - pnpm run build
   artifacts:
     baseDirectory: .next
