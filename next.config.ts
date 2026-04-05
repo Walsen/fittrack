@@ -4,6 +4,17 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  output: "standalone",
+  experimental: {
+    outputFileTracingExcludes: {
+      "*": [
+        "node_modules/@swc/**",
+        "node_modules/@esbuild/**",
+        "node_modules/webpack/**",
+        "node_modules/rollup/**",
+      ],
+    },
+  },
   webpack: (config, { dev }) => {
     if (!dev) {
       if (!config.optimization) {
