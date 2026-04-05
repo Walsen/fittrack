@@ -19,7 +19,7 @@ const schema = a.schema({
     .authorization((allow) => [allow.authenticated()]),
   analyzeTraining: a
     .generation({
-      aiModel: a.ai.model("Claude 3.5 Haiku"),
+      aiModel: a.ai.model("anthropic.claude-3-5-haiku-20241022-v1:0"),
       systemPrompt: `You are a helpful assistant for gym training. 
       You will be provided with a set of trainings and analyze them with which muscles are used and what other trainings can be done.
       Your analysis should not be shorter than 50 characters and longer than 400 characters.`,
@@ -32,7 +32,7 @@ const schema = a.schema({
 
   workoutAssistant: a
     .conversation({
-      aiModel: a.ai.model("Claude 3.5 Haiku"),
+      aiModel: a.ai.model("anthropic.claude-3-5-haiku-20241022-v1:0"),
       systemPrompt: `You are a helpful assistant for gym training.
       When asked, be sure to return a gym plan in training, reps in total and weight format.
       `,
