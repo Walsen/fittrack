@@ -7,6 +7,7 @@ frontend:
       commands:
         - npm install -g pnpm
         - pnpm install
+        - pnpm exec ampx generate outputs --branch $AWS_BRANCH --app-id $AWS_APP_ID
     build:
       commands:
         - pnpm run build
