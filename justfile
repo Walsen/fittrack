@@ -35,8 +35,12 @@ build:
 deploy app-id branch="main":
     pnpm exec ampx pipeline-deploy --branch {{branch}} --app-id {{app-id}}
 
-# Sync Knowledge Base documents to S3
-seed-kb bucket:
+# Sync Knowledge Base documents to S3 (uses KB_BUCKET_NAME from .envrc)
+seed-kb:
+    aws s3 sync ./docs/kb-data s3://{{env_var("KB_BUCKET_NAME")}} --delete
+
+# Sync Knowledge Base documents to S3 (explicit bucket override)
+seed-kb-to bucket:
     aws s3 sync ./docs/kb-data s3://{{bucket}} --delete
 
 # Run linter
