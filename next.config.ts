@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  outputFileTracing: false,
   webpack: (config, { dev }) => {
     if (!dev) {
       if (!config.optimization) {
