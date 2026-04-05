@@ -17,15 +17,15 @@ dev:
 
 # Start sandbox + dev server together
 up:
-    npx ampx sandbox & {{pkg}} run dev
+    pnpm exec ampx sandbox & {{pkg}} run dev
 
 # Start Amplify sandbox
 sandbox:
-    npx ampx sandbox
+    pnpm exec ampx sandbox
 
 # Destroy Amplify sandbox
 sandbox-delete:
-    npx ampx sandbox delete
+    pnpm exec ampx sandbox delete
 
 # Build for production
 build:
@@ -33,7 +33,7 @@ build:
 
 # Deploy to production (requires --app-id)
 deploy app-id branch="main":
-    npx ampx pipeline-deploy --branch {{branch}} --app-id {{app-id}}
+    pnpm exec ampx pipeline-deploy --branch {{branch}} --app-id {{app-id}}
 
 # Sync Knowledge Base documents to S3
 seed-kb bucket:

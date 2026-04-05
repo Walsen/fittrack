@@ -24,12 +24,7 @@ const kbBucket = bucketName
       encryption: s3.BucketEncryption.S3_MANAGED,
     });
 
-const knowledgeBaseId = process.env.KNOWLEDGEBASE_ID;
-if (!knowledgeBaseId) {
-  throw new Error(
-    "KNOWLEDGEBASE_ID environment variable is required. Create a Knowledge Base in the Bedrock console and set this variable."
-  );
-}
+const knowledgeBaseId = process.env.KNOWLEDGEBASE_ID ?? "PLACEHOLDER";
 
 const kbHttpDataSource =
   backend.data.resources.graphqlApi.addHttpDataSource(
@@ -43,18 +38,20 @@ const kbHttpDataSource =
     }
   );
 
-kbHttpDataSource.grantPrincipal.addToPrincipalPolicy(
-  new iam.PolicyStatement({
-    resources: [
-      `arn:aws:bedrock:${dataStack.region}:${dataStack.account}:knowledge-base/${knowledgeBaseId}`,
-    ],
-    actions: ["bedrock:Retrieve"],
-  })
-);
+if (process.env.KNOWLEDGEBASE_ID) {
+  kbHttpDataSource.grantPrincipal.addToPrincipalPolicy(
+    new iam.PolicyStatement({
+      resources: [
+        `arn:aws:bedrock:${dataStack.region}:${dataStack.account}:knowledge-base/${knowledgeBaseId}`,
+      ],
+      actions: ["bedrock:Retrieve"],
+    })
+  );
 
-backend.data.resources.cfnResources.cfnGraphqlApi.environmentVariables = {
-  KNOWLEDGEBASE_ID: knowledgeBaseId,
-};
+  backend.data.resources.cfnResources.cfnGraphqlApi.environmentVariables = {
+    KNOWLEDGEBASE_ID: knowledgeBaseId,
+  };
+}
 
 if (!bucketName) {
   new CfnOutput(dataStack, "KBBucketName", {
