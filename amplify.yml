@@ -1,6 +1,4 @@
 version: 1
-build:
-  computeType: BUILD_GENERAL1_LARGE
 frontend:
   phases:
     preBuild:

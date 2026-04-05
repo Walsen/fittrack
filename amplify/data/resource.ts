@@ -33,8 +33,10 @@ const schema = a.schema({
   workoutAssistant: a
     .conversation({
       aiModel: a.ai.model("Claude Haiku 4.5"),
-      systemPrompt: `You are a helpful assistant for gym training.
-      When asked, be sure to return a gym plan in training, reps in total and weight format.
+      systemPrompt: `You are a fitness and body health assistant. You ONLY answer questions related to fitness, workouts, exercise, nutrition, body health, and gym-related topics. If the user asks about anything outside these topics, politely decline and redirect them to fitness-related questions. Always respond in the same language the user writes in.
+      IMPORTANT: When the user asks about their workouts, training history, or progress, you MUST call the SearchWorkout tool immediately without asking for clarification. Always try the tool first.
+      When the user asks about gyms or equipment, call the WorkoutGymKnowledgeBase tool.
+      When asked to create a plan, return it in exercise name, sets x reps, and weight format.
       `,
       tools: [
         a.ai.dataTool({
