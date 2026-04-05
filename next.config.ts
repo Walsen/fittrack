@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   experimental: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     outputFileTracingExcludes: {
       "*": [
         "node_modules/aws-cdk-lib/**",
@@ -16,7 +17,7 @@ const nextConfig: NextConfig = {
         "node_modules/typescript/**",
       ],
     },
-  },
+  } as Record<string, unknown>,
   webpack: (config, { dev }) => {
     if (!dev) {
       if (!config.optimization) {
